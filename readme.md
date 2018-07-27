@@ -1,7 +1,7 @@
 ### Extracting actors in-scene presence timestamps using CNN embeddings workshop
 
 This repository contains the project for participants of [**AI Summer Weekend**](https://www.facebook.com/events/1841279602835641/). 
-The goal to create an intuition on how to drive AI projects and give practical experience of creating computer vision system using open libraries and existing state of the art approaches
+The goal to create an intuition on how to drive AI projects and give practical experience in creating computer vision system using open libraries and existing state of the art approaches
 
 
 #### Prerequisites
