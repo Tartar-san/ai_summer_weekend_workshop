@@ -6,3 +6,4 @@ tflearn==0.3.2
 dlib=18.18
 imutils=0.4.6
 opencv=3.4.1
+pytorch-cpu==0.4.0
