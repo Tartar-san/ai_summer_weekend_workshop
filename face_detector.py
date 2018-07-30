@@ -6,7 +6,13 @@ detector = MTCNN()
 
 
 def detect_faces(img):
-    """ Detect faces in gray opencv image and returns cropped faces """
+    """ Detect faces in opencv image and returns bounding boxes with keypoints """
+    faces = detector.detect_faces(img)
+    return faces
+
+
+def detect_and_crop_faces(img):
+    """ Detect faces in opencv image and returns cropped faces """
     cropped_faces = []
     faces = detector.detect_faces(img)
     for face in faces:
@@ -20,7 +26,7 @@ if __name__ == "__main__":
     import os
     for filename in os.listdir("testing_images"):
         image = cv2.imread("testing_images/"+filename)
-        faces = detect_faces(image)
+        faces = detect_and_crop_faces(image)
         for face in faces:
             cv2.imshow("1", face)
             cv2.waitKey(0)

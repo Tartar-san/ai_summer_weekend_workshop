@@ -14,33 +14,31 @@ MODEL = 'sphere20a'
 MODEL_PATH = 'sphere20a.pth'
 
 
-def alignment(src_img, bb):
-    """ Crop faces and preprocess them for spherenet """
-    face = crop_bb(src_img, bb)
+def alignment(src_img, src_pts):
+    ref_pts = [[30.2946, 51.6963], [65.5318, 51.5014],
+               [48.0252, 71.7366], [33.5493, 92.3655], [62.7299, 92.2041]]
     crop_size = (96, 112)
-    face_resized = cv2.resize(face, crop_size, interpolation=cv2.INTER_AREA)
-    return face_resized
+
+    src_pts = [src_pts["keypoints"]["left_eye"], src_pts["keypoints"]["right_eye"], src_pts["keypoints"]["nose"],
+               src_pts["keypoints"]["mouth_left"], src_pts["keypoints"]["mouth_right"]]
+    src_pts = np.array(src_pts)
+
+    s = np.array(src_pts).astype(np.float32)
+    r = np.array(ref_pts).astype(np.float32)
+
+    tfm = get_similarity_transform_for_cv2(s, r)
+    face_img = cv2.warpAffine(src_img, tfm, crop_size)
+    return face_img
 
 
-def get_embeddings(img, already_face=False):
-    """ Return embeddings of the face image using spherenet model """
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+def get_embeddings(img, faces):
+    """ Return embeddings of the faces in image using spherenet model """
 
-    if already_face:
-        bbxs = [[0, 0, gray.shape[0], gray.shape[1]]]
-    else:
-        bbxs = detect_faces(gray)
-
-    if len(bbxs) == 0:
-        return None, None
-
-    faces = []
     processed_imgs = []
 
-    for bb in bbxs:
-        face = alignment(img, bb)
-        faces.append(face)
-        processed_img = face.transpose(2, 0, 1).reshape((1, 3, 112, 96))
+    for pts in faces:
+        face_alignment = alignment(img, pts)
+        processed_img = face_alignment.transpose(2, 0, 1).reshape((1, 3, 112, 96))
         processed_img = (processed_img - 127.5) / 128.0
         processed_imgs.append(processed_img)
 
@@ -49,7 +47,7 @@ def get_embeddings(img, already_face=False):
     output = net(processed_img)
     embeddings = output.data.numpy()
 
-    return faces, embeddings
+    return embeddings
 
 
 def compare_embeddings(embedding, embeddings):
@@ -72,7 +70,8 @@ if __name__ == "__main__":
 
     for filename in os.listdir("testing_images"):
         image = cv2.imread("testing_images/" + filename)
-        emebeddings.append(get_embeddings(image))
+        faces = detect_faces(image)
+        emebeddings.append(get_embeddings(image, faces))
 
     print(emebeddings)
 

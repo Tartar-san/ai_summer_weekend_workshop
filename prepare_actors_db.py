@@ -6,6 +6,8 @@ from recognition_model import get_embeddings
 
 dataset_path = "imdb_extracted"
 
+# TODO: Recompute embeddings for actors using MTCNN and save them in efficient way
+
 for celebrity in os.listdir(dataset_path):
     print(celebrity)
     for filename in tqdm(os.listdir(os.path.join(dataset_path, celebrity))):

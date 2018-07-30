@@ -2,6 +2,7 @@ import os
 import numpy as np
 import cv2
 from recognition_model import get_embeddings, compare_embeddings
+from face_detector import detect_faces
 
 video_to_process = "testing_video/johny.mp4"
 actors_dataset_path = "imdb_extracted"
@@ -43,7 +44,8 @@ while(ret):
     if ret:
         if frame_counter % 25 == 0:
             matches = []
-            faces, embeddings_from_video = get_embeddings(frame)
+            faces = detect_faces(frame)
+            embeddings_from_video = get_embeddings(frame, faces)
             for video_embd in embeddings_from_video:
                 similiarity = compare_embeddings(video_embd, actor_embeddings)
                 idx = np.argmax(similiarity)
