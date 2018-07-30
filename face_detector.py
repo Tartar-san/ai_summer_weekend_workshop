@@ -1,23 +1,26 @@
-import dlib
 import cv2
+from mtcnn.mtcnn import MTCNN
 from utils import rect_to_bb, crop_bb
 
-detector = dlib.get_frontal_face_detector()
+detector = MTCNN()
 
 
-def detect_faces(gray_img):
+def detect_faces(img):
     """ Detect faces in gray opencv image and returns cropped faces """
-    rects = detector(gray_img, 1)
-    return [rect_to_bb(r) for r in rects]
+    cropped_faces = []
+    faces = detector.detect_faces(img)
+    for face in faces:
+        box = face["box"]
+        cropped_face = crop_bb(img, box)
+        cropped_faces.append(cropped_face)
+    return cropped_faces
 
 if __name__ == "__main__":
 
     import os
     for filename in os.listdir("testing_images"):
         image = cv2.imread("testing_images/"+filename)
-        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        bbxs = detect_faces(gray)
-        for bb in bbxs:
-            face = crop_bb(image, bb)
+        faces = detect_faces(image)
+        for face in faces:
             cv2.imshow("1", face)
             cv2.waitKey(0)

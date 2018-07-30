@@ -10,7 +10,7 @@ def rect_to_bb(rect):
 def crop_bb(img, bb):
     """ Take a bounding box and crop it from original image """
     x, y, w, h = bb
-    cropped = img[y:y + w, x:x + h]
+    cropped = img[y:y + h, x:x + w]
     return cropped
 
 
